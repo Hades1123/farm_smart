@@ -8,9 +8,9 @@ export class ExampleController {
 
   public getHealth = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      // if (true) throw new UnauthorizedError() // test middleware
+      if (true) throw new UnauthorizedError() // test middleware
       const payload = await this.exampleService.getHealth();
-      res.status(200).json(new ApiResponse(payload));
+      res.json(new ApiResponse(payload));
     } catch (err: unknown) {
       next(err);
     }
