@@ -1,28 +1,22 @@
 import type { Request, Response, NextFunction } from "express";
-import { env } from "../config/env";
-import { AppError } from "../errors/AppError";
+import { ErrorHandlerContext } from "../errors/ErrorContext";
 
+const errorContext = new ErrorHandlerContext();
 
-export const errorHandler = (err: AppError, _req: Request, res: Response, _next: NextFunction): void => {
+export const errorHandler = (error: any, _req: Request, res: Response, _next: NextFunction): void => {
+  // Strategy Pattern Context sẽ tự động chọn cách xử lý lỗi phù hợp
+  const err = errorContext.execute(error);
+
   let statusCode = err.statusCode || 500;
   let message = err.message || "Internal Server Error";
-  let code = err.code || "INTERNAL_ERROR";
-  let details = err.details || null;
-
-  const isOperational = err instanceof AppError;
+  const success = err.success !== undefined ? err.success : false;
+  let data = err.data || [];
 
   const payload: any = {
-    statusCode: statusCode,
-    status: "error",
-    code: isOperational ? code : "INTERNAL_ERROR",
-    message: isOperational ? message : "Something went wrong on our end",
-    ...(details && { details }), 
+    success,
+    message,
+    data
   };
-
-  // Log lỗi hệ thống ra console để theo dõi
-  if (!isOperational) {
-    console.error(">>> SYSTEM ERROR:", err);
-  }
 
   res.status(statusCode).json(payload);
 };

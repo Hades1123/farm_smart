@@ -1,9 +1,19 @@
 export class ApiResponse<T> {
-  public readonly status: string = "success";
+  public readonly success: boolean;
+  public readonly data: T;
 
   constructor(
-    public readonly data: T,
-    public readonly statusCode: number = 200,
-    public readonly message: string = "Success",
-  ) {}
+    data: T,
+    success: boolean = true,
+  ) {
+    this.data = data;
+    this.success = success;
+  }
+
+  toJSON() {
+    return {
+      success: this.success,
+      data: this.data, 
+    };
+  }
 }

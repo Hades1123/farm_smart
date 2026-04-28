@@ -1,17 +1,21 @@
 export class AppError extends Error {
-  public readonly name: string;
-  public readonly isOperational: boolean;
+  public readonly success: boolean = false;
+  public readonly statusCode: number;
+  public readonly data: unknown[];
 
   constructor(
-    public readonly message: string,
-    public readonly statusCode: number,
-    public readonly code: string = 'APP_ERROR',
-    public readonly details: any = null
+    message: string,
+    statusCode: number,
+    data: unknown[] = []
   ) {
     super(message);
-    this.name = this.constructor.name;
-    this.isOperational = true;
 
+    this.name = this.constructor.name;
+    this.statusCode = statusCode;
+    this.data = data;
+
+    // Fix prototype chain (quan trọng khi extend Error trong TS)
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }
 
