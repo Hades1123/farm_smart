@@ -1,10 +1,10 @@
-import type { Request, Response, NextFunction } from "express";
-import type { ExampleService } from "./example.service";
-import { UnauthorizedError } from "../../errors";
-import { ApiResponse } from "../../utils/ApiResponse";
+import type { Request, Response, NextFunction } from 'express';
+import type { ExampleService } from './example.service';
+import { UnauthorizedError } from '../../errors';
+import { ApiResponse } from '../../utils/ApiResponse';
 
 export class ExampleController {
-  public constructor(private readonly exampleService: ExampleService) {}
+    public constructor(private readonly exampleService: ExampleService) {}
 
   public getHealth = async (
     _req: Request,

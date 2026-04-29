@@ -25,7 +25,6 @@ export class DeviceController {
       next(error);
     }
   }
-
   async getDeviceById(req: Request, res: Response, next: NextFunction) {
     try {
       const id = parseInt(req.params.id as string);
@@ -42,10 +41,9 @@ export class DeviceController {
       next(error);
     }
   }
-
-  async createDevice(req: Request, res: Response, next: NextFunction) {
-    try {
-      const data: CreateDeviceDto = CreateDeviceSchema.parse(req.body);
+    async createDevice(req: Request, res: Response, next: NextFunction) {
+        try {
+            const data: CreateDeviceDto = CreateDeviceSchema.parse(req.body);
 
       const newDevice = await deviceService.createDevice(data);
       res
@@ -54,8 +52,7 @@ export class DeviceController {
     } catch (error) {
       next(error);
     }
-  }
-
+    }
   async updateDevice(req: Request, res: Response, next: NextFunction) {
     try {
       const id = parseInt(req.params.id as string);
@@ -73,7 +70,6 @@ export class DeviceController {
       next(error);
     }
   }
-
   async deleteDevice(req: Request, res: Response, next: NextFunction) {
     try {
       const id = parseInt(req.params.id as string);
@@ -89,5 +85,4 @@ export class DeviceController {
       }
       next(error);
     }
-  }
-}
+}}

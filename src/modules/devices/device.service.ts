@@ -5,7 +5,7 @@ import { DeviceType } from "@prisma/client";
 export class DeviceService {
   async getAllDevices(page: number = 1, limit: number = 10) {
     const skip = (page - 1) * limit;
-
+    
     const [devices, total] = await Promise.all([
       prisma.device.findMany({
         skip,
@@ -30,8 +30,8 @@ export class DeviceService {
     const device = await prisma.device.findUnique({
       where: { id },
       include: {
-        sensorData: { take: 5, orderBy: { recordedAt: "desc" } }, // optionally include some recent data
-      },
+        sensorData: { take: 5, orderBy: { recordedAt: 'desc' } }, // optionally include some recent data
+      }
     });
 
     if (!device) {
