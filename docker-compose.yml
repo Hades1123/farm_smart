@@ -1,61 +1,61 @@
 version: '3.8'
 
 services:
-  # ==========================================
-  # PostgreSQL Database Service
-  # ==========================================
-  postgres:
-    # We use PostgreSQL 16 based on your provided build snippet
-    image: postgres:16
-    container_name: farm_smart_db
-    restart: unless-stopped
-    environment:
-      # Database credentials and configuration matching your .env file
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123456
-      POSTGRES_DB: farm
-    ports:
-      # Expose port 5432 to the host so you can connect using external tools (e.g. pgAdmin, DBeaver)
-      - "5432:5432"
-    volumes:
-      # Persist PostgreSQL data in a named volume so that restarting the container doesn't delete your tables
-      - postgres_data:/var/lib/postgresql/data
+    # ==========================================
+    # PostgreSQL Database Service
+    # ==========================================
+    postgres:
+        # We use PostgreSQL 16 based on your provided build snippet
+        image: postgres:16
+        container_name: farm_smart_db
+        restart: unless-stopped
+        environment:
+            # Database credentials and configuration matching your .env file
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: 123456
+            POSTGRES_DB: farm
+        ports:
+            # Expose port 5432 to the host so you can connect using external tools (e.g. pgAdmin, DBeaver)
+            - '5432:5432'
+        volumes:
+            # Persist PostgreSQL data in a named volume so that restarting the container doesn't delete your tables
+            - postgres_data:/var/lib/postgresql/data
 
-  # ==========================================
-  # Node.js App Server Service
-  # ==========================================
-  server:
-    # Use Node 20 or the version that best matches your environment
-    image: node:20
-    container_name: farm_smart_server
-    restart: unless-stopped
-    working_dir: /usr/src/app
-    ports:
-      # Map the container's internal port 8000 to the host machine's port 8000
-      - "8000:8000"
-    environment:
-      # Update the database URL to point to the 'postgres' service instead of localhost.
-      # Docker networking will resolve the hostname 'postgres' to the database container.
-      DATABASE_URL: postgresql://postgres:123456@postgres:5432/farm
-      PORT: 8000
-    volumes:
-      # Mount your current project directory to the container. 
-      # This enables ts-node-dev to detect file changes and hot-reload.
-      - .:/usr/src/app
-      # Mount an anonymous volume for node_modules. 
-      # This prevents native bindings compiled on your Windows host from conflicting with the Linux container.
-      - /usr/src/app/node_modules
-    # Run the server: First install packages, then generate the Prisma client, and finally run the dev script
-    command: >
-      sh -c "npm install && 
-             npx prisma generate && 
-             npx prisma db push && 
-             npm run dev"
-    depends_on:
-      # Ensure the database starts before the application server
-      - postgres
+    # ==========================================
+    # Node.js App Server Service
+    # ==========================================
+    server:
+        # Use Node 20 or the version that best matches your environment
+        image: node:20
+        container_name: farm_smart_server
+        restart: unless-stopped
+        working_dir: /usr/src/app
+        ports:
+            # Map the container's internal port 8000 to the host machine's port 8000
+            - '8000:8000'
+        environment:
+            # Update the database URL to point to the 'postgres' service instead of localhost.
+            # Docker networking will resolve the hostname 'postgres' to the database container.
+            DATABASE_URL: postgresql://postgres:123456@postgres:5432/farm
+            PORT: 8000
+        volumes:
+            # Mount your current project directory to the container.
+            # This enables ts-node-dev to detect file changes and hot-reload.
+            - .:/usr/src/app
+            # Mount an anonymous volume for node_modules.
+            # This prevents native bindings compiled on your Windows host from conflicting with the Linux container.
+            - /usr/src/app/node_modules
+        # Run the server: First install packages, then generate the Prisma client, and finally run the dev script
+        command: >
+            sh -c "npm install && 
+                   npx prisma generate && 
+                   npx prisma db push && 
+                   npm run dev"
+        depends_on:
+            # Ensure the database starts before the application server
+            - postgres
 
 # Define named volumes at the top-level
 volumes:
-  # The postgres_data volume ensures your database data is persisted across container recreations
-  postgres_data:
+    # The postgres_data volume ensures your database data is persisted across container recreations
+    postgres_data:
