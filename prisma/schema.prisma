@@ -57,6 +57,7 @@ model Device {
   @@index([userId])
   @@index([deviceType])
   @@index([location])
+  @@unique([userId, deviceName])
   @@map("devices")
 }
 
