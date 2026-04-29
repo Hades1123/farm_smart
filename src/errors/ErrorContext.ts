@@ -10,9 +10,9 @@ export class ErrorHandlerContext {
 
   constructor() {
     this.strategies = [
-      new ZodErrorStrategy(),     // 1. Kiểm tra lỗi Validation (Zod)
-      new PrismaErrorStrategy(),  // 2. Kiểm tra lỗi Database (Prisma)
-      new HttpErrorStrategy(),    // 3. Kiểm tra lỗi HTTP chủ động (AppError)
+      new ZodErrorStrategy(), // 1. Kiểm tra lỗi Validation (Zod)
+      new PrismaErrorStrategy(), // 2. Kiểm tra lỗi Database (Prisma)
+      new HttpErrorStrategy(), // 3. Kiểm tra lỗi HTTP chủ động (AppError)
       new DefaultErrorStrategy(), // 4. Bắt các lỗi không lường trước còn lại
     ];
   }
@@ -23,7 +23,7 @@ export class ErrorHandlerContext {
         return strategy.handle(error);
       }
     }
-    
+
     // Fallback an toàn (thực ra DefaultErrorStrategy luôn return true)
     return new DefaultErrorStrategy().handle(error);
   }

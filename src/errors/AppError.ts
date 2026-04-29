@@ -3,11 +3,7 @@ export class AppError extends Error {
   public readonly statusCode: number;
   public readonly data: unknown[];
 
-  constructor(
-    message: string,
-    statusCode: number,
-    data: unknown[] = []
-  ) {
+  constructor(message: string, statusCode: number, data: unknown[] = []) {
     super(message);
 
     this.name = this.constructor.name;

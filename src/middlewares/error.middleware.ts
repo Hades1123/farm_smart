@@ -3,7 +3,12 @@ import { ErrorHandlerContext } from "../errors/ErrorContext";
 
 const errorContext = new ErrorHandlerContext();
 
-export const errorHandler = (error: any, _req: Request, res: Response, _next: NextFunction): void => {
+export const errorHandler = (
+  error: any,
+  _req: Request,
+  res: Response,
+  _next: NextFunction,
+): void => {
   // Strategy Pattern Context sẽ tự động chọn cách xử lý lỗi phù hợp
   const err = errorContext.execute(error);
 
@@ -15,7 +20,7 @@ export const errorHandler = (error: any, _req: Request, res: Response, _next: Ne
   const payload: any = {
     success,
     message,
-    data
+    data,
   };
 
   res.status(statusCode).json(payload);

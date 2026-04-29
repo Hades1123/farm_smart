@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-dotenv.config()
+dotenv.config();
 
 export type NodeEnv = "development" | "test" | "production";
 
@@ -22,7 +22,8 @@ const parsePort = (value: string | undefined, fallback: number): number => {
 
 const parseNodeEnv = (): NodeEnv => {
   const value = process.env.NODE_ENV;
-  if (value === "production" || value === "test" || value === "development") return value;
+  if (value === "production" || value === "test" || value === "development")
+    return value;
   return "development";
 };
 
@@ -33,5 +34,6 @@ export const env: Env = {
   MQTT_URL: process.env.MQTT_URL ?? "mqtt://localhost:1883",
   MQTT_USERNAME: process.env.MQTT_USERNAME,
   MQTT_PASSWORD: process.env.MQTT_PASSWORD,
-  MQTT_SUBSCRIBE_TOPIC: process.env.MQTT_SUBSCRIBE_TOPIC ?? "smartfarm/+/telemetry",
+  MQTT_SUBSCRIBE_TOPIC:
+    process.env.MQTT_SUBSCRIBE_TOPIC ?? "smartfarm/+/telemetry",
 };

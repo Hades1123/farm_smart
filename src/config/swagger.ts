@@ -16,10 +16,7 @@ const options = {
     ],
   },
   // Tự động quét các file có đuôi .swagger.ts trong thư mục modules
-  apis: [
-    "./src/modules/**/*.swagger.ts",
-    "./src/modules/**/*.route.ts"
-  ],
+  apis: ["./src/modules/**/*.swagger.ts", "./src/modules/**/*.route.ts"],
 };
 
 export const swaggerSpec = swaggerJSDoc(options);

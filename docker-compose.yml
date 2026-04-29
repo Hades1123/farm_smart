@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # ==========================================
@@ -39,10 +39,10 @@ services:
       DATABASE_URL: postgresql://postgres:123456@postgres:5432/farm
       PORT: 8000
     volumes:
-      # Mount your current project directory to the container. 
+      # Mount your current project directory to the container.
       # This enables ts-node-dev to detect file changes and hot-reload.
       - .:/usr/src/app
-      # Mount an anonymous volume for node_modules. 
+      # Mount an anonymous volume for node_modules.
       # This prevents native bindings compiled on your Windows host from conflicting with the Linux container.
       - /usr/src/app/node_modules
     # Run the server: First install packages, then generate the Prisma client, and finally run the dev script

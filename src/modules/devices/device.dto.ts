@@ -13,8 +13,13 @@ export const querySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(10),
 });
 export const CreateDeviceSchema = z.object({
-  userId: z.number({ message: "userId là bắt buộc" }).int().positive("userId phải là số nguyên dương"),
-  deviceName: z.string({ message: "deviceName là bắt buộc" }).min(1, "Tên thiết bị không được để trống"),
+  userId: z
+    .number({ message: "userId là bắt buộc" })
+    .int()
+    .positive("userId phải là số nguyên dương"),
+  deviceName: z
+    .string({ message: "deviceName là bắt buộc" })
+    .min(1, "Tên thiết bị không được để trống"),
   deviceType: DeviceTypeEnum,
   location: z.string().optional(),
 });

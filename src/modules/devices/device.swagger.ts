@@ -26,7 +26,7 @@
  *           type: string
  *           format: date-time
  *           description: Thời gian tạo
- *     
+ *
  *     CreateDeviceInput:
  *       type: object
  *       required:
@@ -43,7 +43,7 @@
  *           enum: [TEMPERATURE_SENSOR, SOIL_SENSOR, LIGHT_SENSOR, PUMP, LED, LCD]
  *         location:
  *           type: string
- * 
+ *
  *     UpdateDeviceInput:
  *       type: object
  *       properties:
@@ -107,7 +107,7 @@
  *                           type: integer
  *                         totalPages:
  *                           type: integer
- * 
+ *
  *   post:
  *     summary: Thêm thiết bị mới (Yolo:Bit, cảm biến, máy bơm...)
  *     tags: [Devices]
@@ -166,7 +166,7 @@
  *                       $ref: '#/components/schemas/Device'
  *       404:
  *         description: Không tìm thấy thiết bị
- * 
+ *
  *   put:
  *     summary: Cập nhật tên hoặc vị trí đặt thiết bị
  *     tags: [Devices]
@@ -201,7 +201,7 @@
  *                       type: string
  *       404:
  *         description: Không tìm thấy thiết bị
- * 
+ *
  *   delete:
  *     summary: Xóa thiết bị khỏi hệ thống
  *     tags: [Devices]

@@ -9,12 +9,12 @@ export class DefaultErrorStrategy implements IErrorStrategy {
 
   handle(error: any): AppError {
     console.error(">>> UNHANDLED SYSTEM ERROR:", error);
-    
+
     // Nếu có một message cụ thể nhưng không thuộc class AppError
     if (error instanceof Error && error.message) {
       return new InternalError(error.message);
     }
-    
+
     return new InternalError("Internal Server Error");
   }
 }
