@@ -11,6 +11,8 @@ type Env = {
     MQTT_USERNAME?: string;
     MQTT_PASSWORD?: string;
     MQTT_SUBSCRIBE_TOPIC: string;
+    JWT_ACCESS_SECRET: string;
+    JWT_REFRESH_SECRET: string;
 };
 
 const parsePort = (value: string | undefined, fallback: number): number => {
@@ -27,6 +29,18 @@ const parseNodeEnv = (): NodeEnv => {
     return 'development';
 };
 
+const parseRequiredString = (key: string, fallback?: string): string => {
+    const value = process.env[key];
+    if (!value) {
+        if (fallback) {
+            console.warn(`${key} not set, using fallback: ${fallback}`);
+            return fallback;
+        }
+        throw new Error(`Required environment variable ${key} is not set`);
+    }
+    return value;
+};
+
 export const env: Env = {
     PORT: parsePort(process.env.PORT, 8000),
     NODE_ENV: parseNodeEnv(),
@@ -36,4 +50,6 @@ export const env: Env = {
     MQTT_PASSWORD: process.env.MQTT_PASSWORD,
     MQTT_SUBSCRIBE_TOPIC:
         process.env.MQTT_SUBSCRIBE_TOPIC ?? 'smartfarm/+/telemetry',
+    JWT_ACCESS_SECRET: parseRequiredString('JWT_ACCESS_SECRET', process.env.NODE_ENV === 'development' ? 'dev-access-secret-change-me' : undefined),
+    JWT_REFRESH_SECRET: parseRequiredString('JWT_ACCESS_EXPIRES_IN', process.env.NODE_ENV === 'development' ? 'dev-refresh-secret-change-me' : undefined),
 };
