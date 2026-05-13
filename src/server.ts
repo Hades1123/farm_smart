@@ -9,7 +9,7 @@ const server = http.createServer(app);
 
 const start = async (): Promise<void> => {
     await initPrisma();
-    // initMqtt();
+    initMqtt();
     initSocket(server);
 
     server.listen(env.PORT, () => {
@@ -20,7 +20,7 @@ const start = async (): Promise<void> => {
 const shutdown = async (signal: NodeJS.Signals): Promise<void> => {
     console.log(`Received ${signal}, shutting down...`);
     await closeSocket();
-    // await closeMqtt(); // to connect to Adafruit IO
+    await closeMqtt(); // to connect to Adafruit IO
     await prisma.$disconnect();
 
     server.close(() => {

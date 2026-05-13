@@ -10,7 +10,7 @@ type Env = {
     MQTT_URL: string;
     MQTT_USERNAME?: string;
     MQTT_PASSWORD?: string;
-    MQTT_SUBSCRIBE_TOPIC: string;
+    MQTT_SUBSCRIBE_TOPICS: string;
     JWT_ACCESS_SECRET: string;
     JWT_REFRESH_SECRET: string;
 };
@@ -48,8 +48,8 @@ export const env: Env = {
     MQTT_URL: process.env.MQTT_URL ?? 'mqtt://localhost:1883',
     MQTT_USERNAME: process.env.MQTT_USERNAME,
     MQTT_PASSWORD: process.env.MQTT_PASSWORD,
-    MQTT_SUBSCRIBE_TOPIC:
-        process.env.MQTT_SUBSCRIBE_TOPIC ?? 'smartfarm/+/telemetry',
+    MQTT_SUBSCRIBE_TOPICS:
+        process.env.MQTT_SUBSCRIBE_TOPICS ?? 'smartfarm/+/telemetry',
     JWT_ACCESS_SECRET: parseRequiredString('JWT_ACCESS_SECRET', process.env.NODE_ENV === 'development' ? 'dev-access-secret-change-me' : undefined),
     JWT_REFRESH_SECRET: parseRequiredString('JWT_REFRESH_SECRET', process.env.NODE_ENV === 'development' ? 'dev-refresh-secret-change-me' : undefined),
 };
