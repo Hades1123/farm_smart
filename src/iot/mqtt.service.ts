@@ -16,18 +16,25 @@ export const initMqtt = (): MqttClient => {
 
     client.on('connect', () => {
         console.log('MQTT connected');
-        client?.subscribe(env.MQTT_SUBSCRIBE_TOPIC, (err) => {
+
+        const topics = env.MQTT_SUBSCRIBE_TOPICS.split(',');
+
+        client?.subscribe(topics, (err, granted) => {
             if (err) {
                 console.error('MQTT subscribe failed', err);
             } else {
-                console.log(`MQTT subscribed to ${env.MQTT_SUBSCRIBE_TOPIC}`);
+                console.log('Subscribed topics:', granted);
             }
         });
     });
 
     client.on('message', (topic, payload) => {
         const message = payload.toString('utf-8');
-        console.log(`MQTT message on ${topic}: ${message}`);
+
+        console.log('====================');
+        console.log('Topic:', topic);
+        console.log('Payload:', message);
+        console.log('Time:', new Date().toISOString());
     });
 
     client.on('error', (err) => {
