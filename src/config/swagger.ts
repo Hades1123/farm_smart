@@ -14,8 +14,17 @@ const options = {
                 description: 'Development server',
             },
         ],
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                    description: 'Nhập token: Bearer <your_token_here>',
+                },
+            },
+        },
     },
-    // Tự động quét các file có đuôi .swagger.ts trong thư mục modules
     apis: ['./src/modules/**/*.swagger.ts', './src/modules/**/*.route.ts'],
 };
 

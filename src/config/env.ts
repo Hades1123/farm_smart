@@ -51,5 +51,5 @@ export const env: Env = {
     MQTT_SUBSCRIBE_TOPIC:
         process.env.MQTT_SUBSCRIBE_TOPIC ?? 'smartfarm/+/telemetry',
     JWT_ACCESS_SECRET: parseRequiredString('JWT_ACCESS_SECRET', process.env.NODE_ENV === 'development' ? 'dev-access-secret-change-me' : undefined),
-    JWT_REFRESH_SECRET: parseRequiredString('JWT_ACCESS_EXPIRES_IN', process.env.NODE_ENV === 'development' ? 'dev-refresh-secret-change-me' : undefined),
+    JWT_REFRESH_SECRET: parseRequiredString('JWT_REFRESH_SECRET', process.env.NODE_ENV === 'development' ? 'dev-refresh-secret-change-me' : undefined),
 };
