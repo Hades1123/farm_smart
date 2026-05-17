@@ -27,13 +27,10 @@ export class DeviceController {
   }
   async getDeviceById(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = parseInt(req.params.id as string);
-      if (isNaN(id)) {
-        throw new BadRequestError("Invalid device ID");
-      }
+      const id = req.params.id as string;
 
       const device = await deviceService.getDeviceById(id);
-      res.json(new ApiResponse(device, "Get devides by "));
+      res.json(new ApiResponse(device, "Get device by id"));
     } catch (error) {
       if (error instanceof Error && error.message === "Device not found") {
         throw new NotFoundError(error.message);
@@ -55,10 +52,7 @@ export class DeviceController {
     }
   async updateDevice(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = parseInt(req.params.id as string);
-      if (isNaN(id)) {
-        throw new BadRequestError("Invalid device ID");
-      }
+      const id = req.params.id as string;
 
       const data: UpdateDeviceDto = UpdateDeviceSchema.parse(req.body);
       const updatedDevice = await deviceService.updateDevice(id, data);
@@ -72,10 +66,7 @@ export class DeviceController {
   }
   async deleteDevice(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = parseInt(req.params.id as string);
-      if (isNaN(id)) {
-        throw new BadRequestError("Invalid device ID");
-      }
+      const id = req.params.id as string;
 
       const result = await deviceService.deleteDevice(id);
       res.json(new ApiResponse(result, "Device deleted successfully"));
@@ -85,4 +76,5 @@ export class DeviceController {
       }
       next(error);
     }
-}}
+  }
+}

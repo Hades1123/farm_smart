@@ -52,6 +52,35 @@ export const getMqttClient = (): MqttClient => {
     return client;
 };
 
+/**
+ * Publish a value to an Adafruit IO feed via MQTT.
+ * Topic format: {username}/feeds/{feedKey}
+ * Returns true if published successfully, false otherwise.
+ */
+export const publishToFeed = async (
+    feedKey: string,
+    value: string,
+): Promise<boolean> => {
+    if (!client || !client.connected) {
+        console.warn(`MQTT not connected – skipping publish to "${feedKey}"`);
+        return false;
+    }
+
+    const topic = `${env.MQTT_USERNAME}/feeds/${feedKey}`;
+
+    return new Promise<boolean>((resolve) => {
+        client!.publish(topic, value, { qos: 1 }, (err) => {
+            if (err) {
+                console.error(`MQTT publish failed [${topic}]:`, err);
+                resolve(false);
+            } else {
+                console.log(`MQTT published [${topic}]: ${value}`);
+                resolve(true);
+            }
+        });
+    });
+};
+
 export const closeMqtt = async (): Promise<void> => {
     if (!client) return;
 

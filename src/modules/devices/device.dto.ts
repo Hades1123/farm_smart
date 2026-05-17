@@ -14,9 +14,8 @@ export const querySchema = z.object({
 });
 export const CreateDeviceSchema = z.object({
     userId: z
-        .number({ message: 'userId là bắt buộc' })
-        .int()
-        .positive('userId phải là số nguyên dương'),
+        .string({ message: 'userId là bắt buộc' })
+        .uuid('userId phải là UUID hợp lệ'),
     deviceName: z
         .string({ message: 'deviceName là bắt buộc' })
         .min(1, 'Tên thiết bị không được để trống'),
