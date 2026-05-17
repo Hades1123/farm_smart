@@ -63,3 +63,5 @@ npm run dev
 
 - MQTT is currently commented in `src/server.ts`.
 - If you want to enable MQTT, uncomment `initMqtt()` and `closeMqtt()` and update env vars in `.env`.
+
+

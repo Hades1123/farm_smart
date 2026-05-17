@@ -26,7 +26,7 @@ export class DeviceService {
     };
   }
 
-  async getDeviceById(id: number) {
+  async getDeviceById(id: string) {
     const device = await prisma.device.findUnique({
       where: { id },
       include: {
@@ -52,7 +52,7 @@ export class DeviceService {
     });
   }
 
-  async updateDevice(id: number, data: UpdateDeviceDto) {
+  async updateDevice(id: string, data: UpdateDeviceDto) {
     // First verify device exists
     await this.getDeviceById(id);
 
@@ -65,7 +65,7 @@ export class DeviceService {
     });
   }
 
-  async deleteDevice(id: number) {
+  async deleteDevice(id: string) {
     // First verify device exists
     await this.getDeviceById(id);
 
