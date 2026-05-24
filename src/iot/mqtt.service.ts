@@ -1,5 +1,8 @@
 import mqtt, { type IClientOptions, type MqttClient } from 'mqtt';
 import { env } from '../config/env';
+import { SensorService } from '../modules/sensors/sensors.service';
+
+const sensorService = new SensorService();
 
 let client: MqttClient | null = null;
 
@@ -9,6 +12,8 @@ const buildOptions = (): IClientOptions => ({
     reconnectPeriod: 5_000,
 });
 
+const sensorTopics = ['dadn.humidity', 'dadn.temperature', 'dadn.soil-moisture', 'dadn.light'].map((feed) => `${env.MQTT_USERNAME}/feeds/${feed}`);
+
 export const initMqtt = (): MqttClient => {
     if (client) return client;
 
@@ -17,7 +22,8 @@ export const initMqtt = (): MqttClient => {
     client.on('connect', () => {
         console.log('MQTT connected');
 
-        const topics = env.MQTT_SUBSCRIBE_TOPICS.split(',');
+        // const topics = env.MQTT_SUBSCRIBE_TOPICS.split(',');
+        const topics = sensorTopics;
 
         client?.subscribe(topics, (err, granted) => {
             if (err) {
@@ -28,13 +34,19 @@ export const initMqtt = (): MqttClient => {
         });
     });
 
-    client.on('message', (topic, payload) => {
+    client.on('message', async (topic, payload) => {
         const message = payload.toString('utf-8');
 
         console.log('====================');
         console.log('Topic:', topic);
         console.log('Payload:', message);
         console.log('Time:', new Date().toISOString());
+
+        if (sensorTopics.includes(topic)) {
+            // Handle sensor feed messages
+            const result = await sensorService.saveSensorDataFromMqtt(topic, parseFloat(message));
+            console.log(result.message, result.data);
+        }
     });
 
     client.on('error', (err) => {

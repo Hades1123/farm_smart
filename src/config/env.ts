@@ -13,6 +13,7 @@ type Env = {
     MQTT_SUBSCRIBE_TOPICS: string;
     JWT_ACCESS_SECRET: string;
     JWT_REFRESH_SECRET: string;
+    REDIS_URL: string;
 };
 
 const parsePort = (value: string | undefined, fallback: number): number => {
@@ -52,4 +53,5 @@ export const env: Env = {
         process.env.MQTT_SUBSCRIBE_TOPICS ?? 'smartfarm/+/telemetry',
     JWT_ACCESS_SECRET: parseRequiredString('JWT_ACCESS_SECRET', process.env.NODE_ENV === 'development' ? 'dev-access-secret-change-me' : undefined),
     JWT_REFRESH_SECRET: parseRequiredString('JWT_REFRESH_SECRET', process.env.NODE_ENV === 'development' ? 'dev-refresh-secret-change-me' : undefined),
+    REDIS_URL: process.env.REDIS_URL ?? 'redis://localhost:6379',
 };

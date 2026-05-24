@@ -4,11 +4,13 @@ import { env } from './config/env';
 import { initPrisma, prisma } from './config/prisma';
 import { initMqtt, closeMqtt } from './iot/mqtt.service';
 import { initSocket, closeSocket } from './realtime/socket.service';
+import { closeRedis, initRedis } from './config/redis';
 
 const server = http.createServer(app);
 
 const start = async (): Promise<void> => {
     await initPrisma();
+    await initRedis();
     initMqtt();
     initSocket(server);
 
@@ -21,6 +23,7 @@ const shutdown = async (signal: NodeJS.Signals): Promise<void> => {
     console.log(`Received ${signal}, shutting down...`);
     await closeSocket();
     await closeMqtt(); // to connect to Adafruit IO
+    await closeRedis();
     await prisma.$disconnect();
 
     server.close(() => {
