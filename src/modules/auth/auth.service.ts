@@ -3,6 +3,7 @@ import { CreateUserDto, LoginDto, RefreshTokenPayload } from "./auth.dto";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
 import { env } from '../../config/env'
+import type { StringValue } from "ms";
 
 export class AuthService {
     async register(data: CreateUserDto) {
@@ -53,12 +54,12 @@ export class AuthService {
         const accessToken = jwt.sign(
             { ...payload, type: 'access' }, 
             env.JWT_ACCESS_SECRET, 
-            { expiresIn: "15m" }
+            { expiresIn: env.JWT_ACCESS_EXPIRES_IN as StringValue }
         );
         const refreshToken = jwt.sign(
             { id: user.id, type: 'refresh' }, 
             env.JWT_REFRESH_SECRET, 
-            { expiresIn: "7d" }
+            { expiresIn: env.JWT_REFRESH_EXPIRES_IN as StringValue }
         );
 
         return {
@@ -95,7 +96,7 @@ export class AuthService {
         const accessToken = jwt.sign(
             { ...payload, type: 'access' }, 
             env.JWT_ACCESS_SECRET, 
-            { expiresIn: "15m" }
+            { expiresIn: env.JWT_ACCESS_EXPIRES_IN as StringValue }
         );
 
         return {

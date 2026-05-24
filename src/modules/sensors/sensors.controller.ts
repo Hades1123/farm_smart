@@ -3,14 +3,14 @@ import { SensorService } from './sensors.service';
 import { ApiResponse } from '../../utils/ApiResponse';
 import { BadRequestError, NotFoundError } from "../../errors";
 import { SensorThresholdDto, SensorThresholdSchema } from "./sensors.dto";
+import { DataType } from "@prisma/client";
 
 const sensorService = new SensorService();
 
 export class SensorController {
     async getSensorThreshold(req: Request, res: Response, next: NextFunction) {
         try {
-            const userId = req.user!.id;
-            const result = await sensorService.getSensorThreshold(userId);
+            const result = await sensorService.getSensorThreshold();
             res.json(new ApiResponse(result, "Get sensor threshold successfully"));
         } catch (error) {
             next(error);
@@ -19,9 +19,8 @@ export class SensorController {
 
     async updateSensorThreshold(req: Request, res: Response, next: NextFunction) {
         try {
-            const userId = req.user!.id;
             const data: SensorThresholdDto = SensorThresholdSchema.parse(req.body);
-            const result = await sensorService.updateSensorThreshold(userId, data);
+            const result = await sensorService.updateSensorThreshold(data);
             res.json(new ApiResponse(result, "Update sensor threshold successfully"));
         } catch (error) {
             next(error);
@@ -30,8 +29,7 @@ export class SensorController {
 
     async resetSensorThreshold(req: Request, res: Response, next: NextFunction) {
         try {
-            const userId = req.user!.id;
-            const result = await sensorService.resetSensorThreshold(userId);
+            const result = await sensorService.resetSensorThreshold();
             res.json(new ApiResponse(result, "Reset sensor threshold successfully"));
         } catch (error) {
             next(error);
@@ -50,10 +48,10 @@ export class SensorController {
     async getSensorHistory(req: Request, res: Response, next: NextFunction) {
         try {
             const { type, range } = req.query;
-            if (typeof type !== 'string' || typeof range !== 'string' || !['day', 'week', 'month'].includes(range)) {
+            if (typeof type !== 'string' || !Object.values(DataType).includes(type as DataType) || typeof range !== 'string' || !['day', 'week', 'month'].includes(range)) {
                 throw new BadRequestError("Invalid query parameters");
             }
-            const result = await sensorService.getSensorHistory(type, range as 'day' | 'week' | 'month');
+            const result = await sensorService.getSensorHistory(type as DataType, range as 'day' | 'week' | 'month');
             res.json(new ApiResponse(result, "Get sensor history successfully"));
         } catch (error) {
             next(error);

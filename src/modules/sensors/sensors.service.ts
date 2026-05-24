@@ -4,13 +4,13 @@ import { DataType, DeviceType } from '@prisma/client';
 import { getRedisClient } from "../../config/redis";
 
 export class SensorService {
-    async getSensorThreshold(userId: string) {
+    async getSensorThreshold() {
         const threshold = await prisma.sensorThreshold.upsert({
-            where: { userId },
-            update: {}, 
+            where: { id: 1 },
+            update: {},
             create: {
-                userId,
-                temperature: 50,    // giá trị mặc định
+                id: 1,
+                temperature: 50,
                 humidity: 50,
                 light: 50,
                 soilMoisture: 50
@@ -21,30 +21,36 @@ export class SensorService {
                 temperature: true,
                 humidity: true,
             }
-        }); 
+        });
 
         return threshold;
-    };
+    }
 
-    async updateSensorThreshold(userId: string, thresholdData: SensorThresholdDto) {
+    async updateSensorThreshold(thresholdData: SensorThresholdDto) {
         await prisma.sensorThreshold.update({
-            where: { userId },
+            where: { id: 1 },
             data: {
                 soilMoisture: thresholdData.soilMoistureThreshold,
                 light: thresholdData.lightIntensityThreshold,
                 temperature: thresholdData.temperatureThreshold,
                 humidity: thresholdData.humidityThreshold,
+            },
+            select: {
+                soilMoisture: true,
+                light: true,
+                temperature: true,
+                humidity: true,
             }
         });
 
         return { message: "Sensor threshold updated successfully" };
-    };
+    }
 
-    async resetSensorThreshold(userId: string) {
+    async resetSensorThreshold() {
         await prisma.sensorThreshold.update({
-            where: { userId },
+            where: { id: 1 },
             data: {
-                soilMoisture: 50,    // giá trị mặc định
+                soilMoisture: 50,
                 light: 50,
                 temperature: 50,
                 humidity: 50
@@ -52,7 +58,7 @@ export class SensorService {
         });
 
         return { message: "Sensor threshold reset successfully" };
-    };
+    }
 
     async saveSensorDataFromMqtt(feedKey: string, value: number) {
         const redisClient = getRedisClient();
