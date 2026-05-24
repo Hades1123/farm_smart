@@ -80,7 +80,7 @@
  *       properties:
  *         label:
  *           type: string
- *           description: Nhãn thời gian (VD: 14:30, 15/03 14h, 15/03)
+ *           description: Nhãn thời gian
  *         value:
  *           type: number
  *           description: Giá trị trung bình trong khoảng thời gian
