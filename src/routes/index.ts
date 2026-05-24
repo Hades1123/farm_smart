@@ -4,6 +4,7 @@ import deviceRoutes from '../modules/devices/device.route';
 import authRoutes from '../modules/auth/auth.route';
 import userRoutes from '../modules/users/users.route';
 import controlRoutes from '../modules/control/control.route';
+import sensorRoutes from '../modules/sensors/sensors.route';
 
 const router = Router();
 
@@ -12,6 +13,7 @@ router.use('/devices', deviceRoutes);
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/control', controlRoutes);
+router.use('/sensors', sensorRoutes);
 
 export default router;
 

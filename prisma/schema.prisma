@@ -25,8 +25,9 @@ model User {
   phone          String?  @db.VarChar(15)
   createdAt      DateTime @default(now()) @db.Timestamp(6)
 
-  devices      Device[]
+  devices       Device[]
   notifications Notification[]
+  threshold     SensorThreshold?
 
   @@map("users")
 }
@@ -48,8 +49,8 @@ model Device {
   location   String?    @db.VarChar(100)
   createdAt  DateTime   @default(now()) @db.Timestamp(6)
 
-  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sensorData  SensorData[]
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sensorData   SensorData[]
   pumpControls PumpControl[]
   rgbControls  RGBControl[]
   displayLogs  DisplayLog[]
@@ -75,12 +76,12 @@ model SensorData {
   value      Float
   recordedAt DateTime @db.Timestamp(6)
 
-  device  Device  @relation(fields: [deviceId], references: [id], onDelete: Cascade)
-  alerts  Alert[]
+  device Device  @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  alerts Alert[]
 
   @@index([dataType])
   @@index([recordedAt])
-  @@index([deviceId, dataType, recordedAt])
+  @@index([dataType, recordedAt])
   @@map("sensor_data")
 }
 
@@ -90,7 +91,7 @@ model DisplayLog {
   content   String   @db.VarChar(32)
   createdAt DateTime @default(now()) @db.Timestamp(6)
 
-  device    Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
 
   @@index([deviceId])
   @@map("display_log")
@@ -100,10 +101,10 @@ model RGBControl {
   id        String   @id @default(uuid()) @db.Uuid
   deviceId  String   @db.Uuid
   isOn      Boolean  @default(false)
-  value     String   // JSON (RGB, etc)
+  value     String // JSON (RGB, etc)
   updatedAt DateTime @default(now()) @db.Timestamp(6)
 
-  device    Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
 
   @@index([deviceId, updatedAt])
   @@index([isOn])
@@ -117,7 +118,7 @@ model PumpControl {
   reason    String?  @db.Text
   updatedAt DateTime @default(now()) @db.Timestamp(6)
 
-  device    Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
 
   @@index([deviceId, updatedAt])
   @@index([isOn])
@@ -131,28 +132,43 @@ enum AlertType {
 }
 
 model Alert {
-  id           String     @id @default(uuid()) @db.Uuid
+  id           String    @id @default(uuid()) @db.Uuid
   alertType    AlertType
-  message      String     @db.Text
-  triggeredAt  DateTime   @default(now()) @db.Timestamp(6)
-  sensorDataId String?    @db.Uuid
+  message      String    @db.Text
+  triggeredAt  DateTime  @default(now()) @db.Timestamp(6)
+  sensorDataId String?   @db.Uuid
 
-  sensorData   SensorData? @relation(fields: [sensorDataId], references: [id], onDelete: SetNull)
+  sensorData SensorData? @relation(fields: [sensorDataId], references: [id], onDelete: SetNull)
 
   @@index([sensorDataId, triggeredAt])
   @@map("alerts")
 }
 
 model Notification {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @db.Uuid
-  message   String   @db.Text
-  isRead    Boolean  @default(false)
-  sentAt    DateTime @default(now()) @db.Timestamp(6)
+  id      String   @id @default(uuid()) @db.Uuid
+  userId  String   @db.Uuid
+  message String   @db.Text
+  isRead  Boolean  @default(false)
+  sentAt  DateTime @default(now()) @db.Timestamp(6)
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, isRead])
   @@index([sentAt])
   @@map("notifications")
+}
+
+model SensorThreshold {
+  userId       String   @id @db.Uuid
+  temperature  Float
+  humidity     Float
+  light        Float
+  soilMoisture Float
+  createdAt    DateTime @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime @updatedAt @db.Timestamp(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId])
+  @@map("sensor_thresholds")
 }
