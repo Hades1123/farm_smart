@@ -5,6 +5,7 @@ import authRoutes from '../modules/auth/auth.route';
 import userRoutes from '../modules/users/users.route';
 import controlRoutes from '../modules/control/control.route';
 import sensorRoutes from '../modules/sensors/sensors.route';
+import adafruitRoutes from '../modules/adafruit/adafruit.route';
 
 const router = Router();
 
@@ -14,6 +15,6 @@ router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/control', controlRoutes);
 router.use('/sensors', sensorRoutes);
+router.use('/adafruit', adafruitRoutes);
 
 export default router;
-
