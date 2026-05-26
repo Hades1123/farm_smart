@@ -1,84 +1,127 @@
 import mqtt, { type IClientOptions, type MqttClient } from 'mqtt';
-import { env } from '../config/env';
 import { SensorService } from '../modules/sensors/sensors.service';
+import { getSocket } from '../realtime/socket.service';
 
 const sensorService = new SensorService();
 
 let client: MqttClient | null = null;
 
+// Lazy getters để tránh env bị override khi module load
+const getUsername = () => process.env.MQTT_USERNAME ?? '';
+const getPassword = () => process.env.MQTT_PASSWORD ?? '';
+const getMqttUrl  = () => process.env.MQTT_URL ?? 'mqtts://io.adafruit.com';
+
+// ─── Feed → metadata map ──────────────────────────────────────────────────────
+const SENSOR_FEEDS: Record<string, string> = {
+    'dadn.humidity':     'humidity',
+    'dadn.temperature':  'temperature',
+    'dadn.soil-moisture':'soil',
+    'dadn.light':        'light',
+};
+
+const DEVICE_FEEDS: Record<string, 'pump' | 'fan'> = {
+    'dadn.pump-log': 'pump',
+    'dadn.fan-log':  'fan',
+};
+
+// Tất cả feed cần subscribe
+const ALL_FEED_KEYS = [
+    ...Object.keys(SENSOR_FEEDS),
+    ...Object.keys(DEVICE_FEEDS),
+];
+
 const buildOptions = (): IClientOptions => ({
-    username: env.MQTT_USERNAME,
-    password: env.MQTT_PASSWORD,
+    username: getUsername(),
+    password: getPassword(),
     reconnectPeriod: 5_000,
 });
-
-const sensorTopics = ['dadn.humidity', 'dadn.temperature', 'dadn.soil-moisture', 'dadn.light'].map((feed) => `${env.MQTT_USERNAME}/feeds/${feed}`);
 
 export const initMqtt = (): MqttClient => {
     if (client) return client;
 
-    client = mqtt.connect(env.MQTT_URL, buildOptions());
+    const url = getMqttUrl();
+    console.log(`Connecting MQTT to ${url}...`);
+    client = mqtt.connect(url, buildOptions());
 
     client.on('connect', () => {
-        console.log('MQTT connected');
+        console.log('✅ MQTT connected');
 
-        // const topics = env.MQTT_SUBSCRIBE_TOPICS.split(',');
-        const topics = sensorTopics;
+        const topics = ALL_FEED_KEYS.map((feed) => `${getUsername()}/feeds/${feed}`);
 
         client?.subscribe(topics, (err, granted) => {
             if (err) {
                 console.error('MQTT subscribe failed', err);
             } else {
-                console.log('Subscribed topics:', granted);
+                console.log('Subscribed topics:', granted?.map((g) => g.topic).join(', '));
             }
         });
     });
 
     client.on('message', async (topic, payload) => {
-        const message = payload.toString('utf-8');
+        const value = payload.toString('utf-8');
+        // Extract feed key: {username}/feeds/{feedKey}
+        const parts = topic.split('/');
+        const feedKey = parts.slice(2).join('/'); // handles dadn.xxx
 
-        console.log('====================');
-        console.log('Topic:', topic);
-        console.log('Payload:', message);
-        console.log('Time:', new Date().toISOString());
+        console.log(`[MQTT] ${topic} → ${value}`);
 
-        if (sensorTopics.includes(topic)) {
-            // Handle sensor feed messages
-            const result = await sensorService.saveSensorDataFromMqtt(topic, parseFloat(message));
-            console.log(result.message, result.data);
+        // ── Sensor feed ───────────────────────────────────────────────────────
+        const sensorType = SENSOR_FEEDS[feedKey];
+        if (sensorType) {
+            try {
+                const result = await sensorService.saveSensorDataFromMqtt(topic, parseFloat(value));
+                console.log(result.message);
+            } catch (err) {
+                console.error('Failed to save sensor data:', err);
+            }
+
+            // Emit to all connected FE clients
+            try {
+                getSocket().emit('sensor:update', {
+                    type: sensorType,
+                    value: parseFloat(value),
+                    timestamp: new Date().toISOString(),
+                });
+            } catch { /* socket not yet ready */ }
+        }
+
+        // ── Device log feed ───────────────────────────────────────────────────
+        const device = DEVICE_FEEDS[feedKey];
+        if (device) {
+            try {
+                getSocket().emit('device:update', {
+                    device,
+                    value,
+                    isOn: value !== '0',
+                    timestamp: new Date().toISOString(),
+                });
+            } catch { /* socket not yet ready */ }
         }
     });
 
     client.on('error', (err) => {
-        console.error('MQTT error', err);
+        console.error('MQTT error', err.message);
+    });
+
+    client.on('reconnect', () => {
+        console.log('MQTT reconnecting...');
     });
 
     return client;
 };
 
 export const getMqttClient = (): MqttClient => {
-    if (!client) {
-        throw new Error('MQTT client has not been initialized');
-    }
-
+    if (!client) throw new Error('MQTT client has not been initialized');
     return client;
 };
 
-/**
- * Publish a value to an Adafruit IO feed via MQTT.
- * Topic format: {username}/feeds/{feedKey}
- * Returns true if published successfully, false otherwise.
- */
-export const publishToFeed = async (
-    feedKey: string,
-    value: string,
-): Promise<boolean> => {
+export const publishToFeed = async (feedKey: string, value: string): Promise<boolean> => {
     if (!client || !client.connected) {
         console.warn(`MQTT not connected – skipping publish to "${feedKey}"`);
         return false;
     }
 
-    const topic = `${env.MQTT_USERNAME}/feeds/${feedKey}`;
+    const topic = `${getUsername()}/feeds/${feedKey}`;
 
     return new Promise<boolean>((resolve) => {
         client!.publish(topic, value, { qos: 1 }, (err) => {
